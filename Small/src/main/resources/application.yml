@@ -1,0 +1,38 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: small
+
+  # MySQL 数据源：root / 123456
+  # createDatabaseIfNotExist=true：数据库不存在时自动创建（需要 root 权限）
+  datasource:
+    url: jdbc:mysql://localhost:3306/hello_security?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai&useSSL=false&allowPublicKeyRetrieval=true&createDatabaseIfNotExist=true
+    username: root
+    password: 123456
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+  # JPA / Hibernate：自动建表和更新表结构
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    open-in-view: false
+    properties:
+      hibernate:
+        format_sql: true
+        dialect: org.hibernate.dialect.MySQLDialect
+
+# 自定义配置：JWT 签名密钥与有效期
+app:
+  jwt:
+    # 生产环境请改为更长、更随机的密钥，并通过环境变量注入
+    secret: small-spring-boot-security-demo-secret-key-2026-please-change-it
+    # 令牌有效期，单位：分钟
+    expire-minutes: 120
+
+logging:
+  level:
+    com.example.small: info
+    org.springframework.security: warn

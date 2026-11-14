@@ -1,0 +1,1032 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Small · API 控制台</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%230F6B5C'/%3E%3Cpath d='M10 21c1.6 1.2 3.3 1.8 5.3 1.8 2.2 0 3.7-.8 3.7-2.2 0-1.3-1-2-3.4-2.5l-1.6-.3c-2.5-.5-3.8-1.6-3.8-3.5 0-2.3 2.1-3.7 5-3.7 1.8 0 3.4.4 4.7 1.2' fill='none' stroke='%23fff' stroke-width='2.2' stroke-linecap='round'/%3E%3C/svg%3E">
+<style>
+  :root {
+    --paper: #E9EDEA;
+    --surface: #FFFFFF;
+    --surface-soft: #F4F7F5;
+    --ink: #14201D;
+    --ink-soft: #5A6A64;
+    --ink-faint: #86968F;
+    --line: #CFD8D4;
+    --accent: #0F6B5C;
+    --accent-dark: #0A4E43;
+    --accent-soft: #DEEDE8;
+    --danger: #9E3527;
+    --danger-soft: #F7E4E0;
+    --code-bg: #0F1A18;
+    --code-ink: #D7E4DF;
+    --radius: 10px;
+    --font-ui: system-ui, "Microsoft YaHei UI", "Microsoft YaHei", "PingFang SC", sans-serif;
+    --font-mono: ui-monospace, "Cascadia Mono", "Cascadia Code", Consolas, "Microsoft YaHei", monospace;
+  }
+
+  * { box-sizing: border-box; }
+
+  html, body {
+    margin: 0;
+    padding: 0;
+  }
+
+  body {
+    font-family: var(--font-ui);
+    font-size: 15px;
+    line-height: 1.6;
+    color: var(--ink);
+    background: var(--paper);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ===== 顶部栏 ===== */
+  .topbar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px 16px;
+    padding: 14px 20px;
+    background: var(--surface);
+    border-bottom: 1px solid var(--line);
+  }
+
+  .brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-width: 0;
+  }
+
+  .brand-mark {
+    width: 28px;
+    height: 28px;
+    border-radius: 8px;
+    background: var(--accent);
+    display: grid;
+    place-items: center;
+    flex: none;
+  }
+
+  .brand-name {
+    font-family: var(--font-mono);
+    font-size: 17px;
+    font-weight: 700;
+    letter-spacing: .02em;
+  }
+
+  .brand-sub {
+    font-size: 13px;
+    color: var(--ink-soft);
+  }
+
+  .topbar-meta {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--ink-soft);
+  }
+
+  .dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--accent);
+    flex: none;
+  }
+
+  /* ===== 主体 ===== */
+  .wrap {
+    max-width: 1120px;
+    margin: 0 auto;
+    padding: 28px 20px 48px;
+  }
+
+  .lede {
+    max-width: 640px;
+    margin-bottom: 22px;
+  }
+
+  .lede h1 {
+    margin: 0 0 8px;
+    font-size: 25px;
+    line-height: 1.3;
+    font-weight: 700;
+    letter-spacing: -.01em;
+  }
+
+  .lede p {
+    margin: 0;
+    color: var(--ink-soft);
+    font-size: 14.5px;
+    max-width: 56ch;
+  }
+
+  .console {
+    display: grid;
+    gap: 16px;
+    align-items: start;
+  }
+
+  /* ===== 面板 ===== */
+  .panel {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 18px;
+    min-width: 0;
+  }
+
+  .panel-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 6px;
+  }
+
+  .panel-head h2 {
+    margin: 0;
+    font-size: 16px;
+    font-weight: 700;
+  }
+
+  .tag {
+    font-size: 12px;
+    line-height: 1.5;
+    padding: 2px 8px;
+    border-radius: 999px;
+    border: 1px solid var(--line);
+    color: var(--ink-soft);
+    background: var(--surface-soft);
+    white-space: nowrap;
+    flex: none;
+  }
+
+  .tag.on {
+    color: var(--accent-dark);
+    background: var(--accent-soft);
+    border-color: #BCDDD4;
+  }
+
+  .tag.mono { font-family: var(--font-mono); }
+
+  .hint {
+    margin: 0 0 16px;
+    font-size: 13px;
+    line-height: 1.55;
+    color: var(--ink-soft);
+  }
+
+  /* ===== 表单 ===== */
+  .field {
+    margin-bottom: 12px;
+  }
+
+  .field label {
+    display: block;
+    margin-bottom: 5px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--ink-soft);
+  }
+
+  .field input {
+    width: 100%;
+    font-family: var(--font-ui);
+    font-size: 16px;
+    color: var(--ink);
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 10px 12px;
+    transition: border-color .15s ease, box-shadow .15s ease;
+  }
+
+  .field input:focus {
+    outline: none;
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(15, 107, 92, .14);
+  }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    min-height: 44px;
+    padding: 0 16px;
+    font-family: var(--font-ui);
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--ink);
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color .15s ease, border-color .15s ease, color .15s ease;
+  }
+
+  .btn:hover { background: var(--surface-soft); border-color: #B9C6C1; }
+  .btn:active { background: #EAEFEC; }
+  .btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+  .btn.primary {
+    color: #FFFFFF;
+    background: var(--accent);
+    border-color: var(--accent);
+  }
+
+  .btn.primary:hover { background: var(--accent-dark); border-color: var(--accent-dark); }
+  .btn.primary:active { background: #08403A; }
+
+  .btn:disabled {
+    cursor: progress;
+    opacity: .6;
+  }
+
+  .btn.block { width: 100%; margin-top: 4px; }
+
+  .btn.ghost {
+    min-height: 32px;
+    padding: 0 10px;
+    font-size: 12.5px;
+    font-weight: 500;
+    color: var(--ink-soft);
+    border-color: var(--line);
+  }
+
+  .btn.ghost:hover { color: var(--ink); }
+
+  .btn-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 16px;
+  }
+
+  .btn-row .btn { flex: 1 1 180px; }
+
+  /* ===== 令牌区 ===== */
+  .token-box {
+    margin-top: 14px;
+    padding: 12px;
+    border: 1px solid #BCDDD4;
+    border-radius: 8px;
+    background: var(--accent-soft);
+  }
+
+  .token-box[hidden] { display: none; }
+
+  .token-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    margin-bottom: 6px;
+  }
+
+  .token-row .label {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--accent-dark);
+  }
+
+  .token-preview {
+    display: block;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    line-height: 1.6;
+    color: var(--accent-dark);
+    word-break: break-all;
+    background: rgba(255, 255, 255, .7);
+    border-radius: 6px;
+    padding: 8px 10px;
+  }
+
+  .token-meta {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    margin-top: 8px;
+    font-size: 12px;
+    color: var(--accent-dark);
+  }
+
+  /* ===== 提示信息 ===== */
+  .msg {
+    margin: 12px 0 0;
+    min-height: 20px;
+    font-size: 13px;
+    line-height: 1.55;
+  }
+
+  .msg.ok { color: var(--accent-dark); }
+  .msg.error { color: var(--danger); }
+  .msg.info { color: var(--ink-soft); }
+
+  /* ===== 响应区 ===== */
+  .response {
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    overflow: hidden;
+  }
+
+  .response-bar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 6px 12px;
+    padding: 9px 12px;
+    background: var(--surface-soft);
+    border-bottom: 1px solid var(--line);
+  }
+
+  .status-chip {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    font-weight: 700;
+    padding: 2px 9px;
+    border-radius: 5px;
+    background: #E7ECE9;
+    color: var(--ink-soft);
+  }
+
+  .status-chip.ok { background: var(--accent-soft); color: var(--accent-dark); }
+  .status-chip.warn { background: #F8EBD3; color: #8A5A0B; }
+  .status-chip.error { background: var(--danger-soft); color: var(--danger); }
+
+  .resp-meta {
+    font-family: var(--font-mono);
+    font-size: 11.5px;
+    color: var(--ink-faint);
+  }
+
+  .resp-body {
+    margin: 0;
+    padding: 14px 12px;
+    min-height: 92px;
+    max-height: 240px;
+    overflow: auto;
+    background: var(--code-bg);
+    color: var(--code-ink);
+    font-family: var(--font-mono);
+    font-size: 12.5px;
+    line-height: 1.65;
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
+
+  /* ===== 请求记录 ===== */
+  .log-block { margin-top: 18px; }
+
+  .log-block h3 {
+    margin: 0 0 8px;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--ink-soft);
+  }
+
+  .log-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    overflow: hidden;
+  }
+
+  .log-item {
+    display: grid;
+    grid-template-columns: 1fr auto auto;
+    align-items: center;
+    gap: 10px;
+    padding: 9px 12px;
+    font-size: 12.5px;
+    border-bottom: 1px solid #E6ECE9;
+    background: var(--surface);
+  }
+
+  .log-item:last-child { border-bottom: none; }
+
+  .log-req {
+    font-family: var(--font-mono);
+    color: var(--ink);
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .log-req .method { color: var(--accent-dark); font-weight: 700; }
+
+  .log-status {
+    font-family: var(--font-mono);
+    font-weight: 700;
+    padding: 1px 7px;
+    border-radius: 4px;
+    background: #E7ECE9;
+    color: var(--ink-soft);
+  }
+
+  .log-status.ok { background: var(--accent-soft); color: var(--accent-dark); }
+  .log-status.warn { background: #F8EBD3; color: #8A5A0B; }
+  .log-status.error { background: var(--danger-soft); color: var(--danger); }
+
+  .log-time {
+    font-family: var(--font-mono);
+    font-size: 11.5px;
+    color: var(--ink-faint);
+    white-space: nowrap;
+  }
+
+  .log-empty {
+    padding: 12px;
+    font-size: 12.5px;
+    color: var(--ink-faint);
+    background: var(--surface);
+  }
+
+  /* ===== 认证流程 ===== */
+  .flow {
+    margin-top: 16px;
+  }
+
+  .steps {
+    display: grid;
+    gap: 12px;
+  }
+
+  .step {
+    position: relative;
+    padding: 14px 14px 14px 44px;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    background: var(--surface-soft);
+    min-width: 0;
+  }
+
+  .step-num {
+    position: absolute;
+    left: 12px;
+    top: 13px;
+    width: 22px;
+    height: 22px;
+    display: grid;
+    place-items: center;
+    border-radius: 50%;
+    background: var(--surface);
+    border: 1px solid #B9C6C1;
+    font-family: var(--font-mono);
+    font-size: 11.5px;
+    font-weight: 700;
+    color: var(--accent-dark);
+  }
+
+  .step h4 {
+    margin: 0 0 4px;
+    font-size: 13.5px;
+    font-weight: 700;
+    font-family: var(--font-mono);
+  }
+
+  .step p {
+    margin: 0;
+    font-size: 12.5px;
+    line-height: 1.6;
+    color: var(--ink-soft);
+  }
+
+  /* ===== 页脚 ===== */
+  .footer {
+    max-width: 1120px;
+    margin: 0 auto;
+    padding: 0 20px 32px;
+    font-size: 12px;
+    color: var(--ink-faint);
+    line-height: 1.7;
+  }
+
+  .footer code {
+    font-family: var(--font-mono);
+    font-size: 11.5px;
+    color: var(--ink-soft);
+  }
+
+  /* ===== 断点：平板与桌面 ===== */
+  @media (min-width: 720px) {
+    .wrap { padding: 34px 26px 56px; }
+    .lede h1 { font-size: 29px; }
+    .panel { padding: 22px; }
+  }
+
+  @media (min-width: 860px) {
+    .steps { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  }
+
+  @media (min-width: 940px) {
+    .console { grid-template-columns: minmax(0, 380px) minmax(0, 1fr); }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    * { transition: none !important; animation: none !important; }
+  }
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="brand">
+    <span class="brand-mark" aria-hidden="true">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round">
+        <path d="M16 5.5C14.7 4.5 13 4 11.2 4 8.9 4 7.4 5.2 7.4 7c0 1.8 1.4 2.6 3.8 3.1l1.4.3c2.4.5 3.7 1.5 3.7 3.3 0 2.1-2.1 3.4-4.9 3.4-1.9 0-3.5-.6-4.8-1.6"/>
+      </svg>
+    </span>
+    <span class="brand-name">Small</span>
+    <span class="brand-sub">API 控制台</span>
+  </div>
+  <div class="topbar-meta">
+    <span>Spring Boot 3.2.0 · Spring Security · MySQL</span>
+    <span class="dot" aria-hidden="true"></span>
+    <span id="svc-host">localhost:8080</span>
+  </div>
+</header>
+
+<main class="wrap">
+  <section class="lede">
+    <h1>在这页上走完一次完整的安全链路</h1>
+    <p>登录拿到令牌，再用令牌访问受保护接口。页面直接调用本机后端，请求与响应都是真实的。</p>
+  </section>
+
+  <div class="console">
+    <!-- ===== 面板：登录 ===== -->
+    <section class="panel" aria-labelledby="auth-title">
+      <div class="panel-head">
+        <h2 id="auth-title">登录</h2>
+        <span class="tag" id="auth-state">未登录</span>
+      </div>
+      <p class="hint">POST /login，由 Spring Security 校验用户名密码，比对数据库中的 BCrypt 密文。</p>
+
+      <form id="login-form" novalidate>
+        <div class="field">
+          <label for="username">用户名</label>
+          <input id="username" name="username" type="text" value="test" autocomplete="username" spellcheck="false">
+        </div>
+        <div class="field">
+          <label for="password">密码</label>
+          <input id="password" name="password" type="password" value="123456" autocomplete="current-password">
+        </div>
+        <button class="btn primary block" type="submit" id="login-btn">登录并获取令牌</button>
+      </form>
+
+      <p class="msg" id="login-msg" role="status" aria-live="polite"></p>
+
+      <div class="token-box" id="token-box" hidden>
+        <div class="token-row">
+          <span class="label">Bearer 令牌</span>
+          <button class="btn ghost" type="button" id="copy-btn">复制</button>
+        </div>
+        <code class="token-preview" id="token-preview"></code>
+        <div class="token-meta">
+          <span id="token-expire">有效期剩余 --:--</span>
+          <button class="btn ghost" type="button" id="logout-btn">退出登录</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== 面板：接口调用 ===== -->
+    <section class="panel" aria-labelledby="call-title">
+      <div class="panel-head">
+        <h2 id="call-title">HelloWorld 接口</h2>
+        <span class="tag mono">GET /helloWorld</span>
+      </div>
+      <p class="hint">这个接口被 Spring Security 保护：不带令牌会被拦下，带上有效令牌才会返回字符串。</p>
+
+      <div class="btn-row">
+        <button class="btn" type="button" id="call-noauth">不带令牌调用</button>
+        <button class="btn primary" type="button" id="call-auth">带令牌调用</button>
+      </div>
+
+      <div class="response">
+        <div class="response-bar">
+          <span class="status-chip" id="resp-status">尚未发起请求</span>
+          <span class="resp-meta" id="resp-meta">—</span>
+        </div>
+<pre class="resp-body" id="resp-body">点击上面的按钮，响应会显示在这里。</pre>
+      </div>
+
+      <div class="log-block">
+        <h3>最近请求</h3>
+        <ul class="log-list" id="log-list">
+          <li class="log-empty">还没有请求记录</li>
+        </ul>
+      </div>
+    </section>
+  </div>
+
+  <!-- ===== 认证流程 ===== -->
+  <section class="panel flow" aria-labelledby="flow-title">
+    <div class="panel-head">
+      <h2 id="flow-title">这条链路是怎么走通的</h2>
+    </div>
+    <div class="steps">
+      <div class="step">
+        <span class="step-num" aria-hidden="true">1</span>
+        <h4>POST /login</h4>
+        <p>提交用户名密码，AuthenticationManager 调用 UserDetailsService 查 sys_user 表，用 BCrypt 比对密码。</p>
+      </div>
+      <div class="step">
+        <span class="step-num" aria-hidden="true">2</span>
+        <h4>签发 JWT</h4>
+        <p>认证通过后用 HmacSHA256 生成令牌，默认有效期 120 分钟，页面把它存在浏览器里。</p>
+      </div>
+      <div class="step">
+        <span class="step-num" aria-hidden="true">3</span>
+        <h4>GET /helloWorld</h4>
+        <p>请求头带上 Authorization: Bearer 令牌，过滤器校验签名与过期时间，通过后返回 HelloWorld。</p>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="footer">
+  <p>页面由 Spring Boot 内置静态资源提供：<code>src/main/resources/static/index.html</code>。后端未启动时，这页的请求会失败。</p>
+  <p>测试账号 <code>test / 123456</code>，接口地址 <code id="svc-base">http://localhost:8080</code>。</p>
+</footer>
+
+<noscript>
+  <p style="padding:16px 20px;color:#9E3527;">这页需要 JavaScript 才能调用接口。</p>
+</noscript>
+
+<script>
+  /* ===== 状态 ===== */
+  var STORAGE_KEY = 'small.auth';
+
+  var state = {
+    token: null,
+    username: null,
+    expiresAt: 0
+  };
+
+  var logEntries = [];
+
+  /* ===== DOM 引用 ===== */
+  var loginForm = document.getElementById('login-form');
+  var loginBtn = document.getElementById('login-btn');
+  var usernameInput = document.getElementById('username');
+  var passwordInput = document.getElementById('password');
+  var loginMsg = document.getElementById('login-msg');
+  var authState = document.getElementById('auth-state');
+  var tokenBox = document.getElementById('token-box');
+  var tokenPreview = document.getElementById('token-preview');
+  var tokenExpire = document.getElementById('token-expire');
+  var copyBtn = document.getElementById('copy-btn');
+  var logoutBtn = document.getElementById('logout-btn');
+  var callNoAuthBtn = document.getElementById('call-noauth');
+  var callAuthBtn = document.getElementById('call-auth');
+  var respStatus = document.getElementById('resp-status');
+  var respMeta = document.getElementById('resp-meta');
+  var respBody = document.getElementById('resp-body');
+  var logList = document.getElementById('log-list');
+
+  /* ===== 工具函数 ===== */
+  function setMsg(text, kind) {
+    loginMsg.textContent = text || '';
+    loginMsg.className = 'msg' + (kind ? ' ' + kind : '');
+  }
+
+  function formatTime(date) {
+    function pad(n) { return n < 10 ? '0' + n : '' + n; }
+    return pad(date.getHours()) + ':' + pad(date.getMinutes()) + ':' + pad(date.getSeconds());
+  }
+
+  function maskToken(token) {
+    if (!token) return '';
+    if (token.length <= 28) return token;
+    return token.slice(0, 22) + ' … ' + token.slice(-8);
+  }
+
+  function statusClass(status) {
+    if (status >= 200 && status < 300) return 'ok';
+    if (status === 401 || status === 403) return 'warn';
+    if (status >= 500) return 'error';
+    return '';
+  }
+
+  function statusText(status) {
+    if (status === 0) return '请求失败';
+    return 'HTTP ' + status;
+  }
+
+  function prettyBody(text, contentType) {
+    if (!text) return '(空响应)';
+    if (contentType && contentType.indexOf('json') >= 0) {
+      try {
+        return JSON.stringify(JSON.parse(text), null, 2);
+      } catch (e) {
+        return text;
+      }
+    }
+    return text;
+  }
+
+  /* ===== 令牌存取 ===== */
+  function saveToken() {
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    } catch (e) {
+      /* 隐私模式下可能写不进去，忽略即可 */
+    }
+  }
+
+  function loadToken() {
+    try {
+      var raw = localStorage.getItem(STORAGE_KEY);
+      if (!raw) return;
+      var saved = JSON.parse(raw);
+      if (saved && saved.token && saved.expiresAt > Date.now()) {
+        state.token = saved.token;
+        state.username = saved.username;
+        state.expiresAt = saved.expiresAt;
+      } else {
+        localStorage.removeItem(STORAGE_KEY);
+      }
+    } catch (e) {
+      localStorage.removeItem(STORAGE_KEY);
+    }
+  }
+
+  function clearToken(silent) {
+    state.token = null;
+    state.username = null;
+    state.expiresAt = 0;
+    try {
+      localStorage.removeItem(STORAGE_KEY);
+    } catch (e) { /* 忽略 */ }
+    renderAuth();
+    if (!silent) setMsg('已退出登录，令牌已清除', 'info');
+  }
+
+  /* ===== 渲染 ===== */
+  function renderAuth() {
+    var loggedIn = !!state.token && state.expiresAt > Date.now();
+
+    authState.textContent = loggedIn ? ('已登录 ' + state.username) : '未登录';
+    authState.className = 'tag' + (loggedIn ? ' on' : '');
+
+    if (loggedIn) {
+      tokenBox.hidden = false;
+      tokenPreview.textContent = maskToken(state.token);
+      renderCountdown();
+    } else {
+      tokenBox.hidden = true;
+      tokenPreview.textContent = '';
+      tokenExpire.textContent = '有效期剩余 --:--';
+    }
+  }
+
+  function renderCountdown() {
+    if (!state.token) return;
+    var left = state.expiresAt - Date.now();
+
+    if (left <= 0) {
+      clearToken(true);
+      setMsg('令牌已过期，请重新登录', 'error');
+      return;
+    }
+
+    var totalSeconds = Math.floor(left / 1000);
+    var minutes = Math.floor(totalSeconds / 60);
+    var seconds = totalSeconds % 60;
+    var pad = seconds < 10 ? '0' + seconds : '' + seconds;
+    var expiryDate = new Date(state.expiresAt);
+    tokenExpire.textContent = '有效期剩余 ' + minutes + ':' + pad + '（' + formatTime(expiryDate) + ' 失效）';
+  }
+
+  function renderLog() {
+    if (!logEntries.length) {
+      logList.innerHTML = '<li class="log-empty">还没有请求记录</li>';
+      return;
+    }
+
+    var html = '';
+    for (var i = 0; i < logEntries.length; i++) {
+      var item = logEntries[i];
+      html += '<li class="log-item">'
+        + '<span class="log-req"><span class="method">' + item.method + '</span> ' + item.path + '</span>'
+        + '<span class="log-status ' + statusClass(item.status) + '">' + statusText(item.status) + '</span>'
+        + '<span class="log-time">' + item.time + ' · ' + item.elapsed + 'ms</span>'
+        + '</li>';
+    }
+    logList.innerHTML = html;
+  }
+
+  function addLog(method, path, status, elapsed) {
+    logEntries.unshift({
+      method: method,
+      path: path,
+      status: status,
+      elapsed: elapsed,
+      time: formatTime(new Date())
+    });
+    if (logEntries.length > 6) logEntries.pop();
+    renderLog();
+  }
+
+  function renderResponse(status, elapsed, text, contentType, note) {
+    respStatus.textContent = status ? statusText(status) : '请求失败';
+    respStatus.className = 'status-chip ' + (status ? statusClass(status) : 'error');
+
+    if (status) {
+      respMeta.textContent = '耗时 ' + elapsed + 'ms · ' + (contentType || '未知类型');
+    } else {
+      respMeta.textContent = note || '无法连接后端';
+    }
+
+    respBody.textContent = status
+      ? prettyBody(text, contentType)
+      : (note || '请求没有到达后端，请确认应用已启动。');
+  }
+
+  /* ===== 登录 ===== */
+  function setLoginBusy(busy) {
+    loginBtn.disabled = busy;
+    loginBtn.textContent = busy ? '登录中…' : '登录并获取令牌';
+  }
+
+  function handleLogin(event) {
+    event.preventDefault();
+
+    var username = usernameInput.value.trim();
+    var password = passwordInput.value;
+
+    if (!username || !password) {
+      setMsg('用户名和密码都不能为空', 'error');
+      return;
+    }
+
+    setLoginBusy(true);
+    setMsg('正在请求 POST /login …', 'info');
+
+    var started = performance.now();
+
+    fetch('/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ username: username, password: password })
+    }).then(function (res) {
+      var elapsed = Math.round(performance.now() - started);
+      return res.text().then(function (text) {
+        return { res: res, text: text, elapsed: elapsed };
+      });
+    }).then(function (result) {
+      var res = result.res;
+      var data = null;
+      try {
+        data = JSON.parse(result.text);
+      } catch (e) {
+        data = null;
+      }
+
+      addLog('POST', '/login', res.status, result.elapsed);
+
+      if (res.ok && data && data.token) {
+        state.token = data.token;
+        state.username = data.username;
+        state.expiresAt = Date.now() + (data.expiresIn ? data.expiresIn * 1000 : 0);
+        saveToken();
+        renderAuth();
+        setMsg('登录成功，令牌已签发，有效期 ' + Math.round((data.expiresIn || 0) / 60) + ' 分钟', 'ok');
+        renderResponse(res.status, result.elapsed, result.text, res.headers.get('content-type'));
+      } else {
+        clearToken(true);
+        var message = (data && data.message) ? data.message : '登录失败';
+        setMsg(message, 'error');
+        renderResponse(res.status, result.elapsed, result.text, res.headers.get('content-type'));
+      }
+    }).catch(function (error) {
+      var elapsed = Math.round(performance.now() - started);
+      addLog('POST', '/login', 0, elapsed);
+      setMsg('请求没有发出：' + error.message, 'error');
+      renderResponse(0, elapsed, '', '', '无法连接后端，请确认 Spring Boot 已启动');
+    }).then(function () {
+      setLoginBusy(false);
+    });
+  }
+
+  /* ===== 调用受保护接口 ===== */
+  function callHelloWorld(withToken) {
+    var headers = {};
+    var note = '';
+
+    if (withToken) {
+      if (!state.token) {
+        setMsg('还没有令牌，请先登录', 'error');
+        renderResponse(0, 0, '', '', '未登录：请先在左侧点「登录并获取令牌」');
+        respStatus.textContent = '缺少令牌';
+        respStatus.className = 'status-chip warn';
+        return;
+      }
+      headers['Authorization'] = 'Bearer ' + state.token;
+    } else {
+      note = '这次请求故意不带 Authorization 头';
+    }
+
+    var started = performance.now();
+
+    fetch('/helloWorld', { method: 'GET', headers: headers })
+      .then(function (res) {
+        var elapsed = Math.round(performance.now() - started);
+        return res.text().then(function (text) {
+          return { res: res, text: text, elapsed: elapsed };
+        });
+      })
+      .then(function (result) {
+        addLog('GET', '/helloWorld', result.res.status, result.elapsed);
+        renderResponse(result.res.status, result.elapsed, result.text,
+          result.res.headers.get('content-type'), note);
+
+        if (result.res.status === 401) {
+          if (withToken) {
+            setMsg('令牌无效或已过期，请重新登录', 'error');
+            clearToken(true);
+          } else {
+            setMsg('被拦下了：401，受保护接口需要令牌', 'info');
+          }
+        } else if (result.res.ok) {
+          setMsg(withToken ? '认证通过，接口返回 HelloWorld' : '这次也通过了，说明令牌仍有效', 'ok');
+        }
+      })
+      .catch(function (error) {
+        var elapsed = Math.round(performance.now() - started);
+        addLog('GET', '/helloWorld', 0, elapsed);
+        renderResponse(0, elapsed, '', '', '无法连接后端，请确认 Spring Boot 已启动');
+      });
+  }
+
+  /* ===== 复制令牌 ===== */
+  function copyToken() {
+    if (!state.token) return;
+
+    function done() { setMsg('令牌已复制到剪贴板', 'ok'); }
+    function fail() { setMsg('复制失败，请手动选中令牌文本', 'error'); }
+
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(state.token).then(done, function () {
+        legacyCopy(state.token) ? done() : fail();
+      });
+    } else {
+      legacyCopy(state.token) ? done() : fail();
+    }
+  }
+
+  function legacyCopy(text) {
+    try {
+      var area = document.createElement('textarea');
+      area.value = text;
+      area.setAttribute('readonly', 'readonly');
+      area.style.position = 'fixed';
+      area.style.opacity = '0';
+      document.body.appendChild(area);
+      area.select();
+      var ok = document.execCommand('copy');
+      document.body.removeChild(area);
+      return ok;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  /* ===== 绑定事件 ===== */
+  loginForm.addEventListener('submit', handleLogin);
+  callNoAuthBtn.addEventListener('click', function () { callHelloWorld(false); });
+  callAuthBtn.addEventListener('click', function () { callHelloWorld(true); });
+  copyBtn.addEventListener('click', copyToken);
+  logoutBtn.addEventListener('click', function () { clearToken(false); });
+
+  /* ===== 启动 ===== */
+  loadToken();
+  renderAuth();
+  renderLog();
+  setInterval(renderCountdown, 1000);
+
+  /* 顶部与页脚显示当前实际访问地址，换端口也准确 */
+  (function showBaseUrl() {
+    var host = window.location.host;
+    var base = host ? (window.location.protocol + '//' + host) : 'http://localhost:8080';
+    var hostEl = document.getElementById('svc-host');
+    var baseEl = document.getElementById('svc-base');
+    if (hostEl && host) hostEl.textContent = host;
+    if (baseEl) baseEl.textContent = base;
+  })();
+</script>
+
+</body>
+</html>
